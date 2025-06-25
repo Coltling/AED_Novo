@@ -69,7 +69,6 @@ int processarUsuario(FILE* file, char* linha) {
  */
 int processarEmprestimo(FILE* file, char* linha) {
     Emprestimo emprestimo;
-    Cabecalho cabecalho;
     char* token;
 
     strtok(linha, ";"); // descarta "E;"
@@ -86,8 +85,10 @@ int processarEmprestimo(FILE* file, char* linha) {
     } else {
         emprestimo.data_devolucao[0] = '\0'; // ativo
     }
-
-    emprestar_livro(file, emprestimo.codigo_usuario, emprestimo.codigo_livro,emprestimo.data_emprestimo, emprestimo.data_devolucao);
+    
+    if (!emprestar_livro(file, emprestimo.codigo_usuario, emprestimo.codigo_livro, emprestimo.data_emprestimo, emprestimo.data_devolucao)) {
+        return 0;
+    }
 
     return 1;
 }

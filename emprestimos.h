@@ -38,4 +38,6 @@ int usuario_existe(FILE *arquivo, int codigo_usuario);
  */
 void obter_data_atual(char *data);
 
+int verifica_data(char* data);
+
 #endif // EMPRESTIMOS_H

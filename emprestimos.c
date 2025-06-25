@@ -28,6 +28,21 @@ void obter_data_atual(char *data) {
             tm_info->tm_year + 1900);
 }
 
+int verifica_data(char* data) {
+	char data_copia[11];
+	strcpy(data_copia, data);
+    char* token;
+	int dia, mes, ano;
+    token = strtok(data_copia, "/"); if (!token) return 0;dia = atoi(token);
+    token = strtok(NULL, "/"); if (!token) return 0;mes = atoi(token);
+    token = strtok(NULL, "/"); if (!token) return 0;ano = atoi(token);
+    if((mes==1||mes==3||mes==5||mes==7||mes==8||mes==10||mes==12) && (dia<=31 && dia>0) ||
+        (mes==4||mes==6||mes==9||mes==11) && (dia<=30 && dia>0) || (mes==2 && (dia<=28 && dia>0))){
+        return 1; // Data valida
+	}
+	return 0; // Data inválida 
+}
+
 /**
  * @brief Registra um empréstimo de livro.
  *
@@ -65,19 +80,27 @@ int emprestar_livro(FILE* arquivo, int codigo_usuario, int codigo_livro, char da
     Emprestimo em;
     em.codigo_usuario = codigo_usuario;
     em.codigo_livro = codigo_livro;
+
     if (!strlen(data_emprestimo)) {
         obter_data_atual(em.data_emprestimo);
+    }else if (verifica_data(data_emprestimo)){
+        strcpy(em.data_emprestimo, data_emprestimo);
+    }else{
+        printf("Data de empréstimo inválida.\n");
+        return 0;
     }
-    else {
-		strcpy(em.data_emprestimo, data_emprestimo);
-    }
+
     if (!strlen(data_devolucao)) {
-        em.data_devolucao[0] = '\0'; // Empréstimo ativo
+		em.data_devolucao[0] = '\0'; // Devolução pendente
+    }
+    else if (verifica_data(data_devolucao)) {
+        strcpy(em.data_devolucao, data_devolucao);
     }
     else {
-		strcpy(em.data_devolucao,data_devolucao); // Empréstimo já devolvido
+        printf("Data de devolucao inválida.\n");
+        return 0;
     }
-    
+
 
     // Configura ponteiros para inserir no início da lista
     em.proxima_pos = cab.pos_cabeca_emprestimos;
@@ -100,9 +123,11 @@ int emprestar_livro(FILE* arquivo, int codigo_usuario, int codigo_livro, char da
     }
 
     // Atualiza exemplares do livro
-    if (!atualizar_exemplares_livro(arquivo, codigo_livro, -1)) {
-        printf("Erro ao atualizar exemplares\n");
-        return 0;
+    if (strlen(em.data_devolucao)){
+        if (!atualizar_exemplares_livro(arquivo, codigo_livro, -1)) {
+            printf("Erro ao atualizar exemplares\n");
+            return 0;
+        }
     }
 
     printf("Empréstimo realizado em %s.\n", em.data_emprestimo);
