@@ -21,9 +21,6 @@ void mostrarMenu() {
     printf("3. Listar todos os livros\n");
     printf("4. Buscar livro por título\n");
     printf("5. Calcular total de livros\n\n");
-
-    printf("Operações com Usuários e Empréstimos:\n\n");
-
     printf("6. Cadastrar usuário\n");
     printf("7. Emprestar livro\n");
     printf("8. Devolver livro\n");
