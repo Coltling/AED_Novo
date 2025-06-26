@@ -14,17 +14,26 @@
 void mostrarMenu() {
     printf("\n=== SISTEMA DE BIBLIOTECA ===\n\n");
     
-    printf("Operações com Livros:\n\n");
+    printf("Gerenciamento de Livros:\n\n");
     
     printf("1. Cadastrar livro\n");
     printf("2. Imprimir dados do livro\n");
     printf("3. Listar todos os livros\n");
     printf("4. Buscar livro por título\n");
     printf("5. Calcular total de livros\n\n");
-    printf("6. Cadastrar usuário\n");
+
+    printf("Gerenciamento de Usuários:\n\n");
+
+    printf("6. Cadastrar usuário\n\n");
+
+    printf("Sistema de Empréstimos:\n\n");
+
     printf("7. Emprestar livro\n");
     printf("8. Devolver livro\n");
-    printf("9. Listar livros emprestados\n");
+    printf("9. Listar livros emprestados\n\n");
+
+    printf("Importação em Lote:\n\n");
+
     printf("10. Carregar arquivo texto\n");
     //printf("11. Mostrar informações do arquivo (opção extra)\n");
     printf("\n0. Sair\n\n");
