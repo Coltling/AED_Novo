@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include "estruturas.h"
 
-// ==================== PROTÓTIPOS DAS FUNÇÕES DE USUÁRIOS ====================
-
 /**
  * Propósito: Cadastra um novo usuário no arquivo
  * Pré-condição: arquivo aberto e dados do usuário válidos

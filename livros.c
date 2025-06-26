@@ -1,5 +1,3 @@
-/* livros.c */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,8 +6,12 @@
 #include "arquivo.h"
 #include "estruturas.h"
 
-// Função de comparação case-insensitive portável
-int string_compare_insensitive(const char* a, const char* b) {
+/**
+ * Propósito: Compara duas strings ignorando maiúsculas/minúsculas
+ * Pré-condição: ambas as strings devem ser válidas e terminadas em '\0'
+ * Pós-condição: retorna 0 se forem iguais (ignorando caixa), 1 se diferentes
+ */
+int compara_string(const char* a, const char* b) {
     while (*a && *b) {
         if (tolower(*a) != tolower(*b)) return 1;
         a++;
@@ -19,13 +21,9 @@ int string_compare_insensitive(const char* a, const char* b) {
 }
 
 /**
- * @brief Cadastra um novo livro no arquivo binário.
- * @param file  Ponteiro para o arquivo aberto.
- * @param livro Ponteiro para a estrutura com dados do livro.
- * @return int 1 em sucesso, 0 em falha ou duplicata.
- *
- * @pré file deve estar aberto e livro deve conter dados válidos.
- * @pós Se bem-sucedido, livro inserido no início da lista e cabeçalho atualizado.
+ * Propósito: Cadastra um novo livro no arquivo
+ * Pré-condição: arquivo aberto e dados do livro válidos
+ * Pós-condição: livro inserido no arquivo, cabeçalho atualizado
  */
 int cadastrarLivro(FILE* file, Livro* livro) {
     Cabecalho cabecalho;
@@ -80,14 +78,9 @@ int cadastrarLivro(FILE* file, Livro* livro) {
 }
 
 /**
- * @brief Busca um livro pelo código.
- * @param file   Ponteiro para arquivo.
- * @param codigo Código do livro a buscar.
- * @param livro  Ponteiro para receber dados do livro.
- * @return int 1 se encontrado, 0 caso contrário.
- *
- * @pré file aberto.
- * @pós livro preenchido se retorno for 1.
+ * Propósito: Busca livro por código
+ * Pré-condição: arquivo aberto
+ * Pós-condição: retorna 1 se encontrado (livro carregado), 0 se não encontrado
  */
 int buscarLivroPorCodigo(FILE* file, int codigo, Livro* livro) {
     Cabecalho cabecalho;
@@ -106,15 +99,11 @@ int buscarLivroPorCodigo(FILE* file, int codigo, Livro* livro) {
     return 0;
 }
 
+
 /**
- * @brief Busca um livro pelo título (case-insensitive).
- * @param file   Ponteiro para arquivo.
- * @param titulo Título a buscar.
- * @param livro  Ponteiro para receber dados do livro.
- * @return int 1 se encontrado, 0 caso contrário.
- *
- * @pré file aberto.
- * @pós livro preenchido se retorno for 1.
+ * Propósito: Busca livro por título
+ * Pré-condição: arquivo aberto e título válido
+ * Pós-condição: retorna 1 se encontrado (livro carregado), 0 se não encontrado
  */
 int buscarLivroPorTitulo(FILE* file, char* titulo, Livro* livro) {
     Cabecalho cabecalho;
@@ -127,18 +116,16 @@ int buscarLivroPorTitulo(FILE* file, char* titulo, Livro* livro) {
             perror("Erro de leitura");
             return 0;
         }
-        if (string_compare_insensitive(livro->titulo, titulo) == 0) return 1;
+        if (compara_string(livro->titulo, titulo) == 0) return 1;
         pos = livro->proxima_pos;
     }
     return 0;
 }
 
 /**
- * @brief Calcula e exibe total de livros e exemplares.
- * @param file Ponteiro para arquivo.
- *
- * @pré file aberto.
- * @pós exibe no stdout os totais.
+ * Propósito: Calcula e exibe o total de livros cadastrados
+ * Pré-condição: arquivo aberto
+ * Pós-condição: total de livros e exemplares impressos na tela
  */
 void calcularTotalLivros(FILE* file) {
     Cabecalho cabecalho;
@@ -164,11 +151,9 @@ void calcularTotalLivros(FILE* file) {
 }
 
 /**
- * @brief Imprime os dados de um livro.
- * @param livro Ponteiro para o livro a ser impresso.
- *
- * @pré livro preenchido.
- * @pós exibe no stdout dados formatados.
+ * Propósito: Imprime dados de um livro
+ * Pré-condição: livro válido
+ * Pós-condição: dados do livro impressos na tela
  */
 void imprimirLivro(Livro* livro) {
     printf("\n--- DADOS DO LIVRO ---\n");
@@ -183,11 +168,9 @@ void imprimirLivro(Livro* livro) {
 }
 
 /**
- * @brief Lista todos os livros cadastrados.
- * @param file Ponteiro para arquivo.
- *
- * @pré file aberto.
- * @pós exibe no stdout lista de livros ou mensagem se vazio.
+ * Propósito: Lista todos os livros cadastrados
+ * Pré-condição: arquivo aberto
+ * Pós-condição: todos os livros impressos na tela
  */
 void listarTodosLivros(FILE* file) {
     Cabecalho cabecalho;
@@ -216,11 +199,10 @@ void listarTodosLivros(FILE* file) {
     printf("===============================\n\n");
 }
 
-// ==================== FUNÇÕES AUXILIARES PARA EMPRÉSTIMOS ====================
-
 /**
- * @brief Verifica disponibilidade de um livro
- * @return Número de exemplares disponíveis, -1 se não encontrado
+ * Propósito: Verifica a disponibilidade de exemplares de um livro
+ * Pré-condição: arquivo aberto
+ * Pós-condição: retorna número de exemplares disponíveis ou -1 se não encontrado
  */
 int verificar_livro_disponivel(FILE* file, int codigo) {
     Livro livro;
@@ -231,9 +213,9 @@ int verificar_livro_disponivel(FILE* file, int codigo) {
 }
 
 /**
- * @brief Atualiza exemplares de um livro
- * @param delta Valor a adicionar (pode ser negativo)
- * @return 1 em sucesso, 0 em falha
+ * Propósito: Atualiza a quantidade de exemplares de um livro
+ * Pré-condição: arquivo aberto
+ * Pós-condição: número de exemplares atualizado no arquivo, se encontrado
  */
 int atualizar_exemplares_livro(FILE* file, int codigo, int delta) {
     Cabecalho cab;
@@ -263,8 +245,9 @@ int atualizar_exemplares_livro(FILE* file, int codigo, int delta) {
 }
 
 /**
- * @brief Obtém título de um livro
- * @return 1 em sucesso, 0 em falha
+ * Propósito: Obtém o título de um livro dado seu código
+ * Pré-condição: arquivo aberto
+ * Pós-condição: título copiado para o ponteiro fornecido, retorna 1 se sucesso
  */
 int obter_titulo_livro(FILE* file, int codigo, char* titulo) {
     Livro livro;

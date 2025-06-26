@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include "estruturas.h"
 
-// ==================== PROTÓTIPOS DAS FUNÇÕES DE ARQUIVO ====================
-
 /**
  * Propósito: Abre arquivo binário para leitura/escrita, criando se não existir
  * Pré-condição: nome do arquivo válido

@@ -4,10 +4,10 @@
 // ==================== ESTRUTURAS ====================
 
 /**
- * @brief Cabeçalho do arquivo binário, controla listas encadeadas e contadores.
+ * Cabeçalho do arquivo binário, controla listas encadeadas e contadores.
  *
  * pos_cabeca_*: posição do primeiro registro de cada lista (-1 se vazia).
- * pos_topo_*  : próxima posição livre no arquivo (onde gravar o próximo registro).
+ * pos_topo_*  : próxima posição livre no arquivo.
  * total_*     : contadores de registros já gravados.
  */
 typedef struct {
@@ -24,7 +24,7 @@ typedef struct {
 
 
 /**
- * @brief Registro de um Livro.
+ * Registro de um Livro.
  *
  * codigo       : identificador único do livro.
  * titulo, autor, editora: strings com tamanho fixo.
@@ -39,12 +39,12 @@ typedef struct {
     int edicao;
     int ano;
     int exemplares;
-    int proxima_pos;  // posição do próximo livro na lista (-1 se for o último)
+    int proxima_pos;
 } Livro;
 
 
 /**
- * @brief Registro de um Usuário.
+ * Registro de um Usuário.
  *
  * codigo     : identificador único do usuário.
  * nome       : string com tamanho máximo de 50 caracteres.
@@ -53,12 +53,12 @@ typedef struct {
 typedef struct {
     int codigo;
     char nome[51];
-    int proxima_pos;  // posição do próximo usuário na lista (-1 se for o último)
+    int proxima_pos;
 } Usuario;
 
 
 /**
- * @brief Registro de um Empréstimo.
+ * Registro de um Empréstimo.
  *
  * codigo_usuario : código do usuário que tomou o livro.
  * codigo_livro   : código do livro emprestado.
@@ -71,7 +71,7 @@ typedef struct {
     int codigo_livro;
     char data_emprestimo[11];
     char data_devolucao[11];
-    int proxima_pos;  // posição do próximo empréstimo na lista (-1 se for o último)
+    int proxima_pos;
 } Emprestimo;
 
-#endif // ESTRUTURAS_H
+#endif

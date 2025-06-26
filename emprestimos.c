@@ -1,5 +1,3 @@
-/* emprestimos.c */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,59 +7,34 @@
 #include "usuarios.h"
 #include "livros.h"
 #include "emprestimos.h"
+#include "carregamento.h"
 
-// ==================== FUNÇÕES DE EMPRÉSTIMOS ====================
 
 /**
- * @brief Obtém a data atual no formato DD/MM/AAAA.
- *
- * @param data Buffer de ao menos 11 bytes para receber a string.
- * @pré data não é NULL e tem espaço suficiente.
- * @pós data preenchida com a data atual, terminada em '\0'.
+ * Propósito: Obtém a data atual no formato DD/MM/AAAA
+ * Pré-condições: buffer deve ter pelo menos 11 caracteres
+ * Pós-condições: buffer preenchido com data atual
  */
-void obter_data_atual(char *data) {
+void obter_data_atual(char* data) {
     time_t t = time(NULL);
-    struct tm *tm_info = localtime(&t);
+    struct tm* tm_info = localtime(&t);
     sprintf(data, "%02d/%02d/%04d",
             tm_info->tm_mday,
             tm_info->tm_mon + 1,
             tm_info->tm_year + 1900);
 }
 
-int verifica_data(char* data) {
-	char data_copia[11];
-	strcpy(data_copia, data);
-    char* token;
-	int dia, mes, ano;
-    token = strtok(data_copia, "/"); if (!token) return 0;dia = atoi(token);
-    token = strtok(NULL, "/"); if (!token) return 0;mes = atoi(token);
-    token = strtok(NULL, "/"); if (!token) return 0;ano = atoi(token);
-    if((mes==1||mes==3||mes==5||mes==7||mes==8||mes==10||mes==12) && (dia<=31 && dia>0) ||
-        (mes==4||mes==6||mes==9||mes==11) && (dia<=30 && dia>0) || (mes==2 && (dia<=28 && dia>0))){
-        return 1; // Data valida
-	}
-	return 0; // Data inválida 
-}
-
 /**
- * @brief Registra um empréstimo de livro.
- *
- * @param arquivo        Ponteiro para o arquivo aberto.
- * @param codigo_usuario Código do usuário.
- * @param codigo_livro   Código do livro.
- * @return int           1 em sucesso, 0 em falha.
- *
- * @pré arquivo aberto, usuário e livro existem.
- * @pós Empréstimo adicionado na lista e exemplares decrementados.
+ * Propósito: Registra um novo empréstimo de livro
+ * Pré-condições: arquivo deve estar aberto, codigo_usuario e codigo_livro devem existir
+ * Pós-condições: empréstimo registrado no arquivo, exemplares disponíveis decrementados
  */
 int emprestar_livro(FILE* arquivo, int codigo_usuario, int codigo_livro, char data_emprestimo[], char data_devolucao[]) {
-    // Verifica se usuário existe
     if (!usuario_existe(arquivo, codigo_usuario)) {
         printf("Erro: usuário %d não encontrado.\n", codigo_usuario);
         return 0;
     }
 
-    // Busca o livro para verificar existência
     Livro livro;
     if (!buscarLivroPorCodigo(arquivo, codigo_livro, &livro)) {
         printf("Erro: livro %d não encontrado.\n", codigo_livro);
@@ -76,36 +49,43 @@ int emprestar_livro(FILE* arquivo, int codigo_usuario, int codigo_livro, char da
     Cabecalho cab;
     if (!lerCabecalho(arquivo, &cab)) return 0;
 
-    // Prepara o empréstimo
     Emprestimo em;
     em.codigo_usuario = codigo_usuario;
     em.codigo_livro = codigo_livro;
 
-    if (!strlen(data_emprestimo)) {
+    // Tratamento de datas
+    if (strlen(data_emprestimo) == 0) {
         obter_data_atual(em.data_emprestimo);
-    }else if (verifica_data(data_emprestimo)){
+    }
+    else if (verifica_data(data_emprestimo)) {
         strcpy(em.data_emprestimo, data_emprestimo);
-    }else{
+    }
+    else {
         printf("Data de empréstimo inválida.\n");
         return 0;
     }
 
-    if (!strlen(data_devolucao)) {
-		em.data_devolucao[0] = '\0'; // Devolução pendente
+    if (strlen(data_devolucao) == 0) {
+        em.data_devolucao[0] = '\0';
     }
     else if (verifica_data(data_devolucao)) {
         strcpy(em.data_devolucao, data_devolucao);
     }
     else {
-        printf("Data de devolucao inválida.\n");
+        printf("Data de devolução inválida.\n");
         return 0;
     }
 
+    // Valida intervalo de datas
+    if (strlen(data_devolucao) > 0 && !validar_intervalo_datas(em.data_emprestimo, em.data_devolucao)) {
+        printf("Erro: Empréstimo (%s) posterior à devolução (%s)\n", em.data_emprestimo, em.data_devolucao);
+        return 0;
+    }
 
-    // Configura ponteiros para inserir no início da lista
+    // Configura ponteiros
     em.proxima_pos = cab.pos_cabeca_emprestimos;
 
-    // Escreve na área de empréstimos
+    // Escreve no arquivo
     fseek(arquivo, cab.pos_topo_emprestimos, SEEK_SET);
     long pos_nova = ftell(arquivo);
     if (fwrite(&em, sizeof(Emprestimo), 1, arquivo) != 1) {
@@ -113,7 +93,7 @@ int emprestar_livro(FILE* arquivo, int codigo_usuario, int codigo_livro, char da
         return 0;
     }
 
-    // Atualiza cabeçalho: novo empréstimo é a nova cabeça e atualiza topo
+    // Atualiza cabeçalho
     cab.pos_cabeca_emprestimos = pos_nova;
     cab.pos_topo_emprestimos = ftell(arquivo);
     cab.total_emprestimos++;
@@ -122,8 +102,8 @@ int emprestar_livro(FILE* arquivo, int codigo_usuario, int codigo_livro, char da
         return 0;
     }
 
-    // Atualiza exemplares do livro
-    if (strlen(em.data_devolucao)){
+    // Atualiza exemplares se empréstimo ativo
+    if (em.data_devolucao[0] == '\0') {
         if (!atualizar_exemplares_livro(arquivo, codigo_livro, -1)) {
             printf("Erro ao atualizar exemplares\n");
             return 0;
@@ -135,17 +115,11 @@ int emprestar_livro(FILE* arquivo, int codigo_usuario, int codigo_livro, char da
 }
 
 /**
- * @brief Registra a devolução de um livro emprestado.
- *
- * @param arquivo        Ponteiro para o arquivo aberto.
- * @param codigo_usuario Código do usuário.
- * @param codigo_livro   Código do livro.
- * @return int           1 em sucesso, 0 em falha.
- *
- * @pré arquivo aberto.
- * @pós Data de devolução preenchida e exemplares incrementados.
+ * Propósito: Registra a devolução de um livro emprestado
+ * Pré-condições: arquivo deve estar aberto, empréstimo deve existir
+ * Pós-condições: data de devolução atualizada, exemplares disponíveis incrementados
  */
-int devolver_livro(FILE *arquivo, int codigo_usuario, int codigo_livro) {
+int devolver_livro(FILE* arquivo, int codigo_usuario, int codigo_livro) {
     Cabecalho cab;
     if (!lerCabecalho(arquivo, &cab)) return 0;
 
@@ -180,7 +154,7 @@ int devolver_livro(FILE *arquivo, int codigo_usuario, int codigo_livro) {
         return 0;
     }
 
-    // Atualiza exemplares do livro
+    // Atualiza exemplares
     if (!atualizar_exemplares_livro(arquivo, codigo_livro, 1)) {
         printf("Erro ao atualizar exemplares\n");
         return 0;
@@ -191,22 +165,19 @@ int devolver_livro(FILE *arquivo, int codigo_usuario, int codigo_livro) {
 }
 
 /**
- * @brief Lista todos os empréstimos ativos (não devolvidos).
- *
- * @param arquivo Ponteiro para o arquivo aberto.
- *
- * @pré arquivo aberto.
- * @pós Exibe na tela todos os empréstimos ativos formatados.
+ * Propósito: Lista todos os livros atualmente emprestados (não devolvidos)
+ * Pré-condições: arquivo deve estar aberto
+ * Pós-condições: lista impressa na tela com código do usuário, nome, código do livro, título e data de empréstimo
  */
-void listar_livros_emprestados(FILE *arquivo) {
+void listar_livros_emprestados(FILE* arquivo) {
     Cabecalho cab;
     if (!lerCabecalho(arquivo, &cab)) return;
 
     Emprestimo em;
     char nome[51], titulo[151];
     printf("\n=== EMPRÉSTIMOS ATIVOS ===\n");
-    printf("%-8s %-20s %-8s %-30s %-12s %-12s\n", "Cód.U", "Usuário", "Cód.L", "Título", "Empréstimo", "Devolvido");
-    printf("---------------------------------------------------------------------------------------------\n");
+    printf("%-8s %-20s %-8s %-30s %-12s\n", "Cód.U", "Usuário", "Cód.L", "Título", "Empréstimo");
+    printf("--------------------------------------------------------------------------------\n");
 
     long pos = cab.pos_cabeca_emprestimos;
     int encontrou = 0;
@@ -216,15 +187,17 @@ void listar_livros_emprestados(FILE *arquivo) {
             perror("Erro de leitura");
             break;
         }
-        obter_nome_usuario(arquivo, em.codigo_usuario, nome);
-        obter_titulo_livro(arquivo, em.codigo_livro, titulo);
-        printf("%-8d %-20s %-8d %-30s %-12s %-12s\n",
-        em.codigo_usuario, nome, em.codigo_livro, titulo, em.data_emprestimo, em.data_devolucao);
-        encontrou = 1;
+        if (em.data_devolucao[0] == '\0') {
+            obter_nome_usuario(arquivo, em.codigo_usuario, nome);
+            obter_titulo_livro(arquivo, em.codigo_livro, titulo);
+            printf("%-8d %-20s %-8d %-30s %-12s\n",
+                   em.codigo_usuario, nome, em.codigo_livro, titulo, em.data_emprestimo);
+            encontrou = 1;
+        }
         pos = em.proxima_pos;
     }
     if (!encontrou)
         printf("Nenhum empréstimo ativo.\n");
 
-    printf("---------------------------------------------------------------------------------------------\n");
+    printf("--------------------------------------------------------------------------------\n");
 }

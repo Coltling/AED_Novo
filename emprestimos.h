@@ -25,19 +25,10 @@ int devolver_livro(FILE *arquivo, int codigo_usuario, int codigo_livro);
 void listar_livros_emprestados(FILE *arquivo);
 
 /**
- * Propósito: Verifica se um usuário existe no sistema
- * Pré-condições: arquivo deve estar aberto
- * Pós-condições: retorna 1 se usuário existe, 0 caso contrário
- */
-int usuario_existe(FILE *arquivo, int codigo_usuario);
-
-/**
  * Propósito: Obtém a data atual no formato DD/MM/AAAA
  * Pré-condições: buffer deve ter pelo menos 11 caracteres
  * Pós-condições: buffer preenchido com data atual
  */
 void obter_data_atual(char *data);
 
-int verifica_data(char* data);
-
-#endif // EMPRESTIMOS_H
+#endif

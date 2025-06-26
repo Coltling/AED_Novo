@@ -39,4 +39,26 @@ int processarEmprestimo(FILE* file, char* linha);
  */
 int carregarArquivo(FILE* file, char* nomeArquivoTexto);
 
-#endif // CARREGAMENTO_H
+/**
+ * Propósito: Verifica se uma data está no formato DD/MM/AAAA e é válida no calendário.
+ * Pré-condições: A string deve estar nesse formato, com valores numéricos válidos.
+ * Pós-condições: Retorna 1 se a data for válida, 0 caso contrário.
+ */
+int verifica_data(const char* data);
+
+/**
+ * Propósito: Compara duas datas no formato DD/MM/AAAA.
+ * Pré-condições: Ambas devem ser strings válidas nesse formato.
+ * Pós-condições: Retorna -1 se data1 < data2, 0 se iguais, 1 se data1 > data2, -2 se qualquer data for inválida.
+ */
+int comparar_datas(const char* data1, const char* data2);
+
+/**
+ * Propósito: Verifica se a data de devolução não é anterior à data de empréstimo.
+ * Pré-condições: Ambas as datas devem estar no formato DD/MM/AAAA (ou devolução vazia).
+ * Pós-condições: Retorna 1 se o intervalo for válido ou devolução estiver em branco, 0 se inválido.
+ */
+int validar_intervalo_datas(const char* data_emprestimo, const char* data_devolucao);
+
+#endif
+

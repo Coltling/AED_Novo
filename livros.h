@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include "estruturas.h"
 
-// ==================== PROTÓTIPOS DAS FUNÇÕES DE LIVROS ====================
-
 /**
  * Propósito: Cadastra um novo livro no arquivo
  * Pré-condição: arquivo aberto e dados do livro válidos
@@ -15,7 +13,7 @@ int cadastrarLivro(FILE* file, Livro* livro);
 
 /**
  * Propósito: Busca livro por código
- * Pré-condição: arquivo aberto e código válido
+ * Pré-condição: arquivo aberto
  * Pós-condição: retorna 1 se encontrado (livro carregado), 0 se não encontrado
  */
 int buscarLivroPorCodigo(FILE* file, int codigo, Livro* livro);
@@ -48,9 +46,32 @@ void imprimirLivro(Livro* livro);
  */
 void listarTodosLivros(FILE* file);
 
-// Funções auxiliares para empréstimos
+/**
+ * Propósito: Verifica a disponibilidade de exemplares de um livro
+ * Pré-condição: arquivo aberto
+ * Pós-condição: retorna número de exemplares disponíveis ou -1 se não encontrado
+ */
 int verificar_livro_disponivel(FILE* file, int codigo);
+
+/**
+ * Propósito: Atualiza a quantidade de exemplares de um livro
+ * Pré-condição: arquivo aberto
+ * Pós-condição: número de exemplares atualizado no arquivo, se encontrado
+ */
 int atualizar_exemplares_livro(FILE* file, int codigo, int delta);
+
+/**
+ * Propósito: Obtém o título de um livro dado seu código
+ * Pré-condição: arquivo aberto
+ * Pós-condição: título copiado para o ponteiro fornecido, retorna 1 se sucesso
+ */
 int obter_titulo_livro(FILE* file, int codigo, char* titulo);
+
+/**
+ * Propósito: Compara duas strings ignorando maiúsculas/minúsculas
+ * Pré-condição: ambas as strings devem ser válidas e terminadas em '\0'
+ * Pós-condição: retorna 0 se forem iguais (ignorando caixa), 1 se diferentes
+ */
+int compara_string(const char* a, const char* b);
 
 #endif

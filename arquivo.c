@@ -3,19 +3,16 @@
 #include "arquivo.h"
 #include "estruturas.h"
 
-// Tamanhos máximos estimados para cada seção (em bytes)
-#define AREA_LIVROS 1000000    // ~10.000 livros
-#define AREA_USUARIOS 100000   // ~2.000 usuários
+#define AREA_LIVROS 1000000
+#define AREA_USUARIOS 100000
+
 
 /**
- * @brief Abre (ou cria) o arquivo binário de dados.
- *
- * @param arquivo Nome do arquivo (por exemplo, "biblioteca.dat").
- * @return FILE* Ponteiro para o arquivo aberto em modo "rb+" ou "wb+"; NULL em caso de erro.
- *
- * @pré O sistema de arquivos deve permitir criação/leitura/escrita.
- * @pós Se o arquivo não existia, ele é criado e inicializado com um cabeçalho padrão.
+ * Propósito: Abre arquivo binário para leitura/escrita, criando se não existir
+ * Pré-condição: nome do arquivo válido
+ * Pós-condição: retorna ponteiro para arquivo ou NULL se erro
  */
+
 FILE* abrirArquivoBinario(char arquivo[]) {
     FILE* file = fopen(arquivo, "rb+");  // tenta abrir existente
     if (!file) {
@@ -46,14 +43,9 @@ FILE* abrirArquivoBinario(char arquivo[]) {
 }
 
 /**
- * @brief Lê o cabeçalho do arquivo binário.
- *
- * @param file      Ponteiro para o arquivo (já aberto).
- * @param cabecalho Ponteiro onde será armazenado o cabeçalho lido.
- * @return int 1 em sucesso, 0 em falha.
- *
- * @pré file não pode ser NULL.
- * @pós cabecalho contém os dados do início do arquivo.
+ * Propósito: Lê o cabeçalho do arquivo
+ * Pré-condição: arquivo aberto e válido
+ * Pós-condição: retorna 1 se sucesso, 0 se erro
  */
 int lerCabecalho(FILE* file, Cabecalho* cabecalho) {
     if (!file || !cabecalho) return 0;
@@ -62,14 +54,9 @@ int lerCabecalho(FILE* file, Cabecalho* cabecalho) {
 }
 
 /**
- * @brief Escreve (atualiza) o cabeçalho no início do arquivo.
- *
- * @param file      Ponteiro para o arquivo (já aberto).
- * @param cabecalho Ponteiro para os dados do cabeçalho a serem gravados.
- * @return int 1 em sucesso, 0 em falha.
- *
- * @pré file e cabecalho não podem ser NULL.
- * @pós cabeçalho no arquivo binário é sobrescrito pelos novos dados.
+ * Propósito: Escreve o cabeçalho no arquivo
+ * Pré-condição: arquivo aberto e cabeçalho válido
+ * Pós-condição: retorna 1 se sucesso, 0 se erro
  */
 int escreverCabecalho(FILE* file, Cabecalho* cabecalho) {
     if (!file || !cabecalho) return 0;
@@ -80,12 +67,9 @@ int escreverCabecalho(FILE* file, Cabecalho* cabecalho) {
 }
 
 /**
- * @brief Imprime informações internas do cabeçalho (para depuração/estatísticas).
- *
- * @param cabecalho Ponteiro para os dados do cabeçalho.
- *
- * @pré cabecalho não pode ser NULL.
- * @pós Exibe no stdout as posições e contadores armazenados.
+ * Propósito: Imprime informações do cabeçalho (para debug)
+ * Pré-condição: cabeçalho válido
+ * Pós-condição: informações impressas na tela
  */
 void imprimirCabecalho(Cabecalho* cabecalho) {
     if (!cabecalho) return;

@@ -1,5 +1,3 @@
-/* main.c */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,25 +8,29 @@
 #include "carregamento.h"
 #include "emprestimos.h"
 
-// ==================== MENU E MAIN ====================
-
 /**
- * @brief Exibe o menu principal de opções.
+ * Exibe o menu principal de opções.
  */
 void mostrarMenu() {
-    printf("\n=== SISTEMA DE BIBLIOTECA ===\n");
+    printf("\n=== SISTEMA DE BIBLIOTECA ===\n\n");
+    
+    printf("Operações com Livros:\n\n");
+    
     printf("1. Cadastrar livro\n");
-    printf("2. Buscar livro por código\n");
+    printf("2. Imprimir dados do livro\n");
     printf("3. Listar todos os livros\n");
     printf("4. Buscar livro por título\n");
-    printf("5. Calcular total de livros\n");
+    printf("5. Calcular total de livros\n\n");
+
+    printf("Operações com Usuários e Empréstimos:\n\n");
+
     printf("6. Cadastrar usuário\n");
     printf("7. Emprestar livro\n");
     printf("8. Devolver livro\n");
     printf("9. Listar livros emprestados\n");
     printf("10. Carregar arquivo texto\n");
-    printf("11. Mostrar informações do arquivo (opção extra)\n");
-    printf("0. Sair\n");
+    //printf("11. Mostrar informações do arquivo (opção extra)\n");
+    printf("\n0. Sair\n\n");
     printf("Escolha uma opção: ");
 }
 
@@ -87,7 +89,7 @@ int main() {
                 break;
 
             case 2:
-                printf("\n--- BUSCAR LIVRO POR CÓDIGO ---\n");
+                printf("\n--- IMPRIMIR DADOS DO LIVRO ---\n");
                 printf("Digite o código do livro: ");
                 scanf("%d", &codigo);
 
@@ -99,6 +101,7 @@ int main() {
                 break;
 
             case 3:
+                printf("\n--- LISTAR TODOS OS LIVROS ---\n");
                 listarTodosLivros(arquivo);
                 break;
 
@@ -156,19 +159,22 @@ int main() {
                 break;
 
             case 9:
+                printf("\n--- TOTAL DE LIVROS EMPRESTADOS ---\n");
                 listar_livros_emprestados(arquivo);
                 break;
 
             case 10:
                 printf("\n--- CARREGAR ARQUIVO ---\n");
-                printf("Digite o nome do arquivo texto: ");
+                printf("Digite o nome do arquivo texto a ser carregado: ");
                 fgets(nomeArquivo, sizeof(nomeArquivo), stdin);
                 nomeArquivo[strcspn(nomeArquivo, "\n")] = '\0';
 
                 carregarArquivo(arquivo, nomeArquivo);
                 break;
 
+            // descomentar a opção 11 em MostrarMenu() para exibí-la na tela
             case 11: {
+                printf("\n--- MOSTRAR DADOS DO ARQUIVO BINÁRIO ---\n");
                 Cabecalho cab;
                 if (lerCabecalho(arquivo, &cab)) {
                     imprimirCabecalho(&cab);
