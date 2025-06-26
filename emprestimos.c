@@ -26,7 +26,7 @@ void obter_data_atual(char* data) {
 
 /**
  * Propósito: Registra um novo empréstimo de livro
- * Pré-condições: arquivo deve estar aberto, codigo_usuario e codigo_livro devem existir
+ * Pré-condições: arquivo deve estar aberto
  * Pós-condições: empréstimo registrado no arquivo, exemplares disponíveis decrementados
  */
 int emprestar_livro(FILE* arquivo, int codigo_usuario, int codigo_livro, char data_emprestimo[], char data_devolucao[]) {
